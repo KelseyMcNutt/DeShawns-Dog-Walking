@@ -1,0 +1,9 @@
+.nav {
+    flex-direction: row;
+    background-color: rgb(236, 232, 232);    
+    border-bottom: 1px gray solid;
+}
+
+.nav-walkers {
+    margin: 0px 40px 0px 40px;
+}
