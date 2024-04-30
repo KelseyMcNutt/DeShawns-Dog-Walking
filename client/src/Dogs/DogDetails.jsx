@@ -5,6 +5,7 @@ import { useParams } from "react-router-dom";
 export const DogDetails = () => {
     const { dogId } = useParams();
     const [dogDetails, setDogDetails] = useState(null);
+  
 
     useEffect(() => {
         const fetchDogDetails = async () => {
@@ -15,6 +16,7 @@ export const DogDetails = () => {
         fetchDogDetails();
     } , [dogId])
         
+
 
     return (
         <div>
