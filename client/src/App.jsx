@@ -5,6 +5,7 @@ import { Dogs } from "./Dogs/Dogs";
 import { Route, Routes } from "react-router-dom";
 import { Outlet } from "react-router-dom";
 import { NavBar } from "./NavBar/NavBar";
+import { DogDetails } from "./Dogs/DogDetails"
 
 export const App = () => {
   return (
@@ -21,7 +22,10 @@ export const App = () => {
       
       <Route path="/">
             <Route index element={<Dogs />} />
+            <Route path="/dog/:dogId" element={<DogDetails />} />
       </Route>
+
+      
       
       
       </Route>
