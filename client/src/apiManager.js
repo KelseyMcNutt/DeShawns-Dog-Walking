@@ -12,3 +12,8 @@ export const getDogDetails = async (dogId) => {
   const res = await fetch(`/api/dogdetails?id=${dogId}`);
   return res.json();
 }
+
+export const getWalkers = async () => {
+  const res = await fetch("/api/walkers");
+  return res.json();
+}

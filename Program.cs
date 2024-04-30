@@ -25,10 +25,6 @@ List<WalkerCities> walkerCities = new List<WalkerCities>
 };
 
 
-
-
-
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -65,27 +61,108 @@ app.MapGet("/api/dogs", () =>
     
 });
 
+app.MapGet("api/cities", () =>
+{
+    return cities.Select( c => new CitiesDTO
+    {
+        Id = c.Id,
+        City =  c.City
+    });
+});
+
+app.MapGet("/api/walkers", () =>
+{
+    return walkers.Select( w => new WalkersDTO
+    {
+        Id = w.Id,
+        Name = w.Name
+    });
+});
+
+app.MapGet("/api/filteredWalkers/{cityId}", (int cityId) => 
+{
+    List<WalkerCities> walkercitylist = walkerCities.Where(w => w.CityId == cityId).ToList();
+
+    return Results.Ok(walkercitylist.Select(wc => 
+    {
+        Cities city = cities.FirstOrDefault(c => c.Id == wc.CityId);
+        Walkers walker = walkers.FirstOrDefault(w => w.Id == wc.WalkerId);
+        return new WalkerCitiesDTO
+        {
+            Id = wc.Id,
+            CityId = wc.CityId,
+            City = city != null ? new CitiesDTO 
+            {
+                Id = city.Id,
+                City = city.City
+            } : null,
+            WalkerId = wc.WalkerId,
+            Walker = walker != null ? new WalkersDTO
+            {
+                Id = walker.Id,
+                Name = walker.Name
+            } : null
+        };
+    }).ToList());
+});
+
+
+
 
 app.MapGet("/api/dogdetails", (int id) =>
 {
-Dogs dog = dogs.FirstOrDefault(d => d.Id == id);
-Walkers walker = walkers.FirstOrDefault(w => w.Id == dog.WalkerId);
-if ( dog == null ){
-    return Results.NotFound();
-}
-return Results.Ok(new DogsDTO
-{
-
-    Id = dog.Id,
-    Name = dog.Name,
-    WalkerId = dog.WalkerId,
-    CityId = dog.CityId,
-    Walker = new WalkersDTO
+    Dogs dog = dogs.FirstOrDefault(d => d.Id == id);
+    
+    if (dog == null)
     {
-        Id = walker.Id,
-        Name = walker.Name
+        return Results.NotFound();
     }
+
+    Walkers walker = walkers.FirstOrDefault(w => w.Id == dog.WalkerId);
+
+    DogsDTO dogDTO = new DogsDTO
+    {
+        Id = dog.Id,
+        Name = dog.Name,
+        WalkerId = dog.WalkerId,
+        CityId = dog.CityId
+    };
+
+    if (walker != null)
+    {
+        dogDTO.Walker = new WalkersDTO
+        {
+            Id = walker.Id,
+            Name = walker.Name
+        };
+    }
+    else
+    {
+        dogDTO.Walker = new WalkersDTO
+        {
+            Id = -1, // Or any default ID for no walker
+            Name = "No Walker Assigned"
+        };
+    }
+
+    return Results.Ok(dogDTO);
+});
+
+
+
+app.MapPost("/api/addDog", (Dogs incomingDog) =>
+{
+    incomingDog.Id = dogs.Count() + 1;
+    dogs.Add(incomingDog);
+    return Results.Created($"/api/dogs/{incomingDog.Id}", new DogsDTO
+    {
+        Id = incomingDog.Id,
+        Name = incomingDog.Name,
+        WalkerId = incomingDog.WalkerId,
+        CityId = incomingDog.CityId,
     });
 });
+
+
 
 app.Run();
